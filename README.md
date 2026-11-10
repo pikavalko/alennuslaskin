@@ -1,0 +1,2 @@
+# alennuslaskin
+Alennuslaskin kauppojen prosenttialennuksille.
