@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b3d91">
+<title>Alennuslaskin</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Alennuslaskin">
+<style>
+  /* Kaksi fonttikokoa: --perus (tekstit) ja --iso (numeronäppäimet ja alennettu hinta) */
+  :root {
+    --perus: 1.3rem;
+    --iso: 2rem;
+    --teksti: #111;
+    --harmaa: #e2e5e9;
+    --naytto: #f1f3f5;
+    --oranssi: #f39200;        /* alennustarran oranssi */
+    --vaaleaoranssi: #ffc47a;  /* miedonnettu sävy */
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 112.5%; }
+  body { margin: 0; background: #fff; color: var(--teksti); font-family: Arial, Helvetica, Roboto, sans-serif; line-height: 1.35; font-size: var(--perus); }
+  .piilo { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  main { max-width: 26rem; margin: 0 auto; padding: .75rem; }
+
+  .naytto { display: flex; flex-direction: column; background: var(--naytto); border: 1px solid #c4c8cd; border-radius: 14px; padding: .5rem 1rem; margin-bottom: .75rem; min-height: 11.1rem; }
+  .rivi { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 .5rem; padding: .25rem 0; margin: 0; }
+  .rivi[hidden] { display: none; }
+  .rivi .arvo { margin-left: auto; white-space: nowrap; }
+  .rivi.uusi { font-weight: bold; }
+  .rivi.uusi .arvo { font-size: var(--iso); }
+  .ohje { margin: auto 0 0; padding: .4rem 0 .1rem; font-style: italic; color: #0a5c2b; }
+  .ohje:empty { display: none; }
+
+  .napit { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
+  .napit button { font: inherit; font-weight: bold; font-size: var(--iso); min-height: 3.7rem; border: 0; border-radius: 12px;
+    background: var(--harmaa); color: var(--teksti); cursor: pointer; position: relative;
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    display: flex; align-items: center; justify-content: center; white-space: nowrap; padding: 0 .2rem; }
+  .napit button:active { filter: brightness(.9); transform: translateY(2px); }
+  .napit .sana, .napit .ale.muu { font-size: min(var(--perus), 7.5vw); }
+  .napit .ale { font-size: min(var(--perus), 6.3vw); }
+  .napit .ale.muu { font-size: min(var(--perus), 7.5vw); }
+  .napit .ale { background: var(--vaaleaoranssi); color: var(--teksti); }
+  .napit .ale.muu { background: var(--harmaa); }
+  .napit .ale[aria-pressed="true"] { box-shadow: inset 0 0 0 4px var(--teksti); }
+  .napit .ale[aria-pressed="true"]:not(.muu) { background: var(--oranssi); }
+  .napit .ale[aria-disabled="true"] { background: #f4f5f6; color: #8a8f96; cursor: default; }
+  .napit .ale[aria-disabled="true"]:active { filter: none; transform: none; }
+  .napit .ale .merkki { display: none; position: absolute; top: .3rem; left: .4rem; width: .85rem; height: .85rem; }
+  .napit .ale[aria-pressed="true"] .merkki { display: inline-block; }
+  .napit .leveä { grid-column: span 2; }
+  button:focus-visible { outline: 4px solid #111; outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<main id="laskin" tabindex="-1">
+  <h1 class="piilo">Alennuslaskin</h1>
+  <div class="naytto">
+    <div class="rivi" id="hinta-rivi">
+      <span class="nimi">Alkuperäinen hinta</span>
+      <span class="arvo" id="hinta-arvo">0 €</span>
+    </div>
+    <div class="rivi" id="muu-rivi" hidden>
+      <span class="nimi">Alennusprosentti</span>
+      <span class="arvo" id="muu-arvo">0 %</span>
+    </div>
+    <div id="tulos" class="tulos" aria-live="polite" aria-atomic="true"></div>
+    <p id="ohje" class="ohje" aria-live="polite"></p>
+  </div>
+
+  <div class="napit" role="group" aria-label="Näppäimet">
+    <button type="button" data-n="7">7</button>
+    <button type="button" data-n="8">8</button>
+    <button type="button" data-n="9">9</button>
+    <button type="button" class="ale" data-ale="20" aria-pressed="false"><svg class="merkki" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>-20&nbsp;%</button>
+
+    <button type="button" data-n="4">4</button>
+    <button type="button" data-n="5">5</button>
+    <button type="button" data-n="6">6</button>
+    <button type="button" class="ale" data-ale="30" aria-pressed="false"><svg class="merkki" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>-30&nbsp;%</button>
+
+    <button type="button" data-n="1">1</button>
+    <button type="button" data-n="2">2</button>
+    <button type="button" data-n="3">3</button>
+    <button type="button" class="ale" data-ale="50" aria-pressed="false"><svg class="merkki" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>-50&nbsp;%</button>
+
+    <button type="button" data-n="0">0</button>
+    <button type="button" data-n="," aria-label="pilkku">,</button>
+    <button type="button" id="pyyhi" aria-label="pyyhi viimeinen numero">⌫</button>
+    <button type="button" class="ale" data-ale="60" aria-pressed="false"><svg class="merkki" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>-60&nbsp;%</button>
+
+    <button type="button" class="sana leveä" id="tyhjenna">C Tyhjennä</button>
+    <button type="button" class="ale muu leveä" data-ale="muu" aria-pressed="false"><svg class="merkki" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Muu&nbsp;%</button>
+  </div>
+</main>
+
+<script>
+(function () {
+  var hinta = '';         // näppäilty hinta merkkijonona, esim. "3,5"
+  var muu = '';           // näppäilty oma alennus
+  var alennus = null;     // 20, 30, 50, 60 tai 'muu'
+  var kohde = 'hinta';    // kumpaan näppäimet kirjoittavat
+  var valmis = false;     // tulos valmis: seuraava numero aloittaa uuden hinnan
+
+  var hintaRivi = document.getElementById('hinta-rivi');
+  var muuRivi = document.getElementById('muu-rivi');
+  var hintaArvo = document.getElementById('hinta-arvo');
+  var muuArvo = document.getElementById('muu-arvo');
+  var tulos = document.getElementById('tulos');
+  var ohje = document.getElementById('ohje');
+  var aleNapit = document.querySelectorAll('.ale');
+  var euro = new Intl.NumberFormat('fi-FI', { style: 'currency', currency: 'EUR' });
+
+  function luku(t) { return t === '' ? 0 : parseFloat(t.replace(',', '.')); }
+
+  function lisaa(merkki) {
+    if (kohde === 'hinta' && valmis) { hinta = ''; muu = ''; alennus = null; }
+    valmis = false;
+    if (kohde === 'hinta') {
+      if (merkki === ',') {
+        if (hinta.indexOf(',') !== -1) return;
+        hinta = (hinta === '' ? '0' : hinta) + ',';
+      } else {
+        var osat = hinta.split(',');
+        if (osat.length === 2 && osat[1].length >= 2) return;   // enintään 2 desimaalia
+        if (osat[0].length >= 5 && osat.length === 1) return;  // enintään 99 999 €
+        if (hinta === '0') hinta = '';
+        hinta += merkki;
+      }
+    } else {
+      if (merkki === ',') return;
+      var uusi = (muu === '0' ? '' : muu) + merkki;
+      if (parseInt(uusi, 10) > 100) return;
+      muu = uusi;
+    }
+    paivita();
+  }
+
+  function pyyhi() {
+    valmis = false;
+    if (kohde === 'muu' && muu === '') {
+      // tyhjästä prosentista takaisin hintaan
+      alennus = null; kohde = 'hinta';
+    } else if (kohde === 'hinta') {
+      hinta = hinta.slice(0, -1);
+    } else {
+      muu = muu.slice(0, -1);
+    }
+    paivita();
+  }
+
+  function tyhjenna() {
+    hinta = ''; muu = ''; alennus = null; kohde = 'hinta'; valmis = false;
+    paivita();
+  }
+
+  function valitseAle(arvo) {
+    if (!(luku(hinta) > 0)) return;          // alennukset eivät toimi ennen hintaa
+    muu = '';
+    valmis = arvo !== 'muu';
+    alennus = arvo === 'muu' ? 'muu' : parseInt(arvo, 10);
+    kohde = arvo === 'muu' ? 'muu' : 'hinta';
+    paivita();
+  }
+
+  function paivita() {
+    var h = luku(hinta);
+    if (!(h > 0)) { alennus = null; muu = ''; kohde = 'hinta'; }
+    hintaArvo.textContent = (hinta === '' ? '0' : hinta) + ' €';
+    muuRivi.hidden = alennus === null;
+    muuArvo.textContent = (alennus === 'muu' ? (muu === '' ? '0' : muu) : alennus) + ' %';
+    aleNapit.forEach(function (b) {
+      var v = b.getAttribute('data-ale');
+      b.setAttribute('aria-pressed', String(String(alennus) === v));
+      b.setAttribute('aria-disabled', String(!(h > 0)));
+    });
+
+    var p = alennus === 'muu' ? luku(muu) : alennus;
+
+    if (!(h > 0)) { tyhjaTulos('Näppäile hinta'); return; }
+    if (alennus === null) { tyhjaTulos('Valitse alennus'); return; }
+    if (!(p > 0)) { tyhjaTulos('Näppäile alennusprosentti'); return; }
+
+    ohje.textContent = '';
+    var sentit = Math.round(h * 100);
+    var saasto = Math.round(sentit * p / 100);
+    tulos.innerHTML =
+      '<p class="rivi"><span class="nimi">Alennus</span><span class="arvo">' + euro.format(saasto / 100) + '</span></p>' +
+      '<p class="rivi uusi"><span class="nimi">Alennettu hinta</span><span class="arvo">' + euro.format((sentit - saasto) / 100) + '</span></p>';
+  }
+
+  function tyhjaTulos(teksti) {
+    tulos.innerHTML = '';
+    ohje.textContent = teksti;
+  }
+
+  document.querySelectorAll('[data-n]').forEach(function (b) {
+    b.addEventListener('click', function () { lisaa(b.getAttribute('data-n')); });
+  });
+  aleNapit.forEach(function (b) {
+    b.addEventListener('click', function () { valitseAle(b.getAttribute('data-ale')); });
+  });
+  document.getElementById('pyyhi').addEventListener('click', pyyhi);
+  document.getElementById('tyhjenna').addEventListener('click', tyhjenna);
+
+  // Tietokoneen näppäimistö
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (/^[0-9]$/.test(e.key)) { lisaa(e.key); e.preventDefault(); }
+    else if (e.key === ',' || e.key === '.') { lisaa(','); e.preventDefault(); }
+    else if (e.key === 'Backspace') { pyyhi(); e.preventDefault(); }
+    else if (e.key === 'Escape' || e.key === 'Delete') { tyhjenna(); e.preventDefault(); }
+  });
+
+  paivita();
+})();
+</script>
+<script>
+  // Tallentaa laskimen puhelimeen, jotta se toimii ilman nettiyhteyttä
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+</script>
+</body>
+</html>
