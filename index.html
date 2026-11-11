@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0b3d91">
+<meta name="theme-color" content="#2b2f33">
 <title>Alennuslaskin</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
@@ -12,8 +12,10 @@
 <style>
   /* Kaksi fonttikokoa: --perus (tekstit) ja --iso (numeronäppäimet ja alennettu hinta) */
   :root {
-    --perus: 1.3rem;
-    --iso: 2rem;
+    /* Näppäimen koko määräytyy näytön leveyden mukaan (neliö); pienellä näytöllä korkeus rajoittaa */
+    --nappi: max(3.2rem, min(calc((min(100vw, 26rem) - 3rem) / 4), calc((100vh - 19rem) / 5)));
+    --perus: clamp(1.3rem, calc(var(--nappi) * .28), 1.55rem);
+    --iso: max(1.75rem, calc(var(--nappi) * .36));
     --teksti: #111;
     --harmaa: #e2e5e9;
     --naytto: #f1f3f5;
@@ -22,38 +24,40 @@
   }
   * { box-sizing: border-box; }
   html { font-size: 112.5%; }
-  body { margin: 0; background: #fff; color: var(--teksti); font-family: Arial, Helvetica, Roboto, sans-serif; line-height: 1.35; font-size: var(--perus); }
+  @supports (height: 100dvh) { :root { --nappi: max(3.2rem, min(calc((min(100vw, 26rem) - 3rem) / 4), calc((100dvh - 19rem) / 5))); } }
+  body { margin: 0; background: #2b2f33; color: var(--teksti); font-family: Arial, Helvetica, Roboto, sans-serif; line-height: 1.35; font-size: var(--perus); }
   .piilo { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  main { max-width: 26rem; margin: 0 auto; padding: .75rem; }
+  main { max-width: 26rem; margin: 0 auto; padding: .75rem .75rem calc(.75rem + env(safe-area-inset-bottom));
+    min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 
-  .naytto { display: flex; flex-direction: column; background: var(--naytto); border: 1px solid #c4c8cd; border-radius: 14px; padding: .5rem 1rem; margin-bottom: .75rem; min-height: 11.1rem; }
-  .rivi { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 .5rem; padding: .25rem 0; margin: 0; }
+  .naytto { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; color: #e8eaed; padding: .5rem .25rem; min-height: 11.1rem; margin-bottom: max(.75rem, calc(var(--nappi) * .32)); }
+  .naytto { font-size: clamp(1.15rem, calc(var(--nappi) * .25), 1.4rem); }
+  .rivi { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 .5rem; padding: calc(var(--nappi) * .07) 0; margin: 0; }
   .rivi[hidden] { display: none; }
   .rivi .arvo { margin-left: auto; white-space: nowrap; }
-  .rivi.uusi { font-weight: bold; }
-  .rivi.uusi .arvo { font-size: var(--iso); }
-  .ohje { margin: auto 0 0; padding: .4rem 0 .1rem; font-style: italic; color: #0a5c2b; }
+  .rivi.uusi .arvo { font-weight: bold; font-size: max(min(2.6rem, 11vw), calc(var(--nappi) * .62)); }
+  .tulos .uusi { padding-top: calc(var(--nappi) * .18); color: #ffffff; }
+  .ohje { margin: .25rem 0 0; padding: .4rem 0 .1rem; font-style: italic; color: #9be3ab; }
   .ohje:empty { display: none; }
 
-  .napit { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
-  .napit button { font: inherit; font-weight: bold; font-size: var(--iso); min-height: 3.7rem; border: 0; border-radius: 12px;
-    background: var(--harmaa); color: var(--teksti); cursor: pointer; position: relative;
+  .napit { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: var(--nappi); gap: .5rem; flex-shrink: 0; }
+  .napit button { font: inherit; font-weight: normal; font-size: var(--iso); height: 100%; border: 0; border-radius: 12px;
+    background: #4a4f55; color: #ffffff; cursor: pointer; position: relative;
     touch-action: manipulation; -webkit-tap-highlight-color: transparent;
     display: flex; align-items: center; justify-content: center; white-space: nowrap; padding: 0 .2rem; }
   .napit button:active { filter: brightness(.9); transform: translateY(2px); }
-  .napit .sana, .napit .ale.muu { font-size: min(var(--perus), 7.5vw); }
-  .napit .ale { font-size: min(var(--perus), 6.3vw); }
-  .napit .ale.muu { font-size: min(var(--perus), 7.5vw); }
+  .napit .ale { font-size: min(max(1.3rem, calc(var(--nappi) * .3)), 6.3vw); }
+  .napit .sana, .napit .ale.muu { font-size: min(max(1.3rem, calc(var(--nappi) * .3)), 7.5vw); }
   .napit .ale { background: var(--vaaleaoranssi); color: var(--teksti); }
-  .napit .ale.muu { background: var(--harmaa); }
-  .napit .ale[aria-pressed="true"] { box-shadow: inset 0 0 0 4px var(--teksti); }
-  .napit .ale[aria-pressed="true"]:not(.muu) { background: var(--oranssi); }
-  .napit .ale[aria-disabled="true"] { background: #f4f5f6; color: #8a8f96; cursor: default; }
+  .napit .ale.muu { background: #4a4f55; color: #ffffff; }
+  .napit .ale:not(.muu) { font-weight: bold; }
+  .napit .ale[aria-pressed="true"] { background: var(--oranssi); color: var(--teksti); }
+  .napit .ale[aria-disabled="true"] { background: #383c41; color: #9aa0a6; cursor: default; }
   .napit .ale[aria-disabled="true"]:active { filter: none; transform: none; }
-  .napit .ale .merkki { display: none; position: absolute; top: .3rem; left: .4rem; width: .85rem; height: .85rem; }
-  .napit .ale[aria-pressed="true"] .merkki { display: inline-block; }
   .napit .leveä { grid-column: span 2; }
-  button:focus-visible { outline: 4px solid #111; outline-offset: 3px; }
+  .napit .sana { background: #4a4f55; color: #ffffff; }
+  button:focus-visible { outline: 4px solid #ffffff; outline-offset: 3px; }
+
 </style>
 </head>
 <body>
@@ -77,27 +81,29 @@
     <button type="button" data-n="7">7</button>
     <button type="button" data-n="8">8</button>
     <button type="button" data-n="9">9</button>
-    <button type="button" class="ale" data-ale="20" aria-pressed="false"><svg class="merkki" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>-20&nbsp;%</button>
+    <button type="button" class="ale" data-ale="20" aria-pressed="false">-20&nbsp;%</button>
 
     <button type="button" data-n="4">4</button>
     <button type="button" data-n="5">5</button>
     <button type="button" data-n="6">6</button>
-    <button type="button" class="ale" data-ale="30" aria-pressed="false"><svg class="merkki" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>-30&nbsp;%</button>
+    <button type="button" class="ale" data-ale="30" aria-pressed="false">-30&nbsp;%</button>
 
     <button type="button" data-n="1">1</button>
     <button type="button" data-n="2">2</button>
     <button type="button" data-n="3">3</button>
-    <button type="button" class="ale" data-ale="50" aria-pressed="false"><svg class="merkki" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>-50&nbsp;%</button>
+    <button type="button" class="ale" data-ale="50" aria-pressed="false">-50&nbsp;%</button>
 
     <button type="button" data-n="0">0</button>
     <button type="button" data-n="," aria-label="pilkku">,</button>
     <button type="button" id="pyyhi" aria-label="pyyhi viimeinen numero">⌫</button>
-    <button type="button" class="ale" data-ale="60" aria-pressed="false"><svg class="merkki" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>-60&nbsp;%</button>
+    <button type="button" class="ale" data-ale="60" aria-pressed="false">-60&nbsp;%</button>
 
     <button type="button" class="sana leveä" id="tyhjenna">C Tyhjennä</button>
-    <button type="button" class="ale muu leveä" data-ale="muu" aria-pressed="false"><svg class="merkki" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Muu&nbsp;%</button>
+    <button type="button" class="ale muu leveä" data-ale="muu" aria-pressed="false">Muu&nbsp;%</button>
   </div>
 </main>
+
+
 
 <script>
 (function () {
@@ -107,7 +113,6 @@
   var kohde = 'hinta';    // kumpaan näppäimet kirjoittavat
   var valmis = false;     // tulos valmis: seuraava numero aloittaa uuden hinnan
 
-  var hintaRivi = document.getElementById('hinta-rivi');
   var muuRivi = document.getElementById('muu-rivi');
   var hintaArvo = document.getElementById('hinta-arvo');
   var muuArvo = document.getElementById('muu-arvo');
@@ -183,7 +188,7 @@
     var p = alennus === 'muu' ? luku(muu) : alennus;
 
     if (!(h > 0)) { tyhjaTulos('Näppäile hinta'); return; }
-    if (alennus === null) { tyhjaTulos('Valitse alennus'); return; }
+    if (alennus === null) { tyhjaTulos('Valitse alennusprosentti'); return; }
     if (!(p > 0)) { tyhjaTulos('Näppäile alennusprosentti'); return; }
 
     ohje.textContent = '';
@@ -228,5 +233,6 @@
     });
   }
 </script>
+
 </body>
 </html>

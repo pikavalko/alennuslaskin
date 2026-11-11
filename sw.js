@@ -1,7 +1,7 @@
 // Alennuslaskimen offline-tallennus.
 // Kun laskinta päivitetään, vaihda VERSIO-numeroa, niin puhelimet hakevat uuden version.
-const VERSIO = 'alennuslaskin-v1';
-const TIEDOSTOT = ['./', './index.html', './ohje.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+const VERSIO = 'alennuslaskin-v2';
+const TIEDOSTOT = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSIO).then((c) => c.addAll(TIEDOSTOT)).then(() => self.skipWaiting()));
