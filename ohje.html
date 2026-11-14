@@ -3,15 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Alennuslaskimen lisääminen puhelimen aloitusnäytölle</title>
+<title>Alennuslaskin</title>
 <link rel="icon" href="icon-192.png">
 <style>
   * { box-sizing: border-box; }
   html { font-size: 112.5%; }
   body { margin: 0; background: #fff; color: #111; font-family: Arial, Helvetica, Roboto, sans-serif; line-height: 1.5; }
   main { max-width: 34rem; margin: 0 auto; padding: 1rem 1.25rem 3rem; }
+  .kuva { margin: .5rem 0 1rem; }
+  footer { margin-top: 3rem; font-size: .8rem; color: #555; }
+  .ikoni { display: inline-block; vertical-align: -.45em; width: 1.9em; height: 1.9em; padding: .3em; margin: 0 .1em; border: 1px solid #b9bdc2; border-radius: 8px; background: #f1f3f4; }
+  .ikoni svg { display: block; width: 100%; height: 100%; }
+  .kuva img { display: block; width: 100%; height: auto; border-radius: 8px; }
+  @media (min-width: 60rem) {
+    main { max-width: 68rem; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 34rem); gap: 3rem; align-items: start; padding-top: 2rem; }
+    .kuva { margin: 0; position: sticky; top: 2rem; }
+  }
   h1 { font-size: 1.6rem; line-height: 1.25; margin: .5rem 0 1rem; }
-  h2 { font-size: 1.3rem; margin: 2rem 0 .5rem; }
+  h2 { font-size: 1.3rem; line-height: 1.3; margin: 2rem 0 .5rem; }
+  h3 { font-size: 1.15rem; margin: 1.5rem 0 .5rem; }
   p { margin: 0 0 .75rem; }
   ol, ul { margin: 0 0 1rem; padding-left: 1.5rem; }
   li { margin-bottom: .4rem; }
@@ -21,46 +31,42 @@
 </head>
 <body>
 <main>
-  <h1>Alennuslaskimen lisääminen puhelimen aloitusnäytölle</h1>
-  <p>Alennuslaskin on verkkosivu, jonka voi lisätä puhelimen aloitusnäytölle kuvakkeeksi. Kuvakkeesta laskin aukeaa yhdellä napautuksella samaan tapaan kuin sovellus. Lisääminen tehdään selaimessa.</p>
-  <p>Laskimen osoite: <a href="https://pikavalko.github.io/alennuslaskin/">https://pikavalko.github.io/alennuslaskin/</a></p>
-  <p>Samoilla ohjeilla voit lisätä aloitusnäytölle minkä tahansa verkkosivun.</p>
+  <figure class="kuva">
+    <img src="kuva.png" width="789" height="555" alt="Alennuslaskin kolmessa vaiheessa. Ensin laskin pyytää näppäilemään hinnan. Kun hinnaksi on näppäilty 4,20 €, laskin pyytää valitsemaan alennusprosentin. Kun 30 % on valittu, laskin näyttää alennukseksi 1,26 € ja alennetuksi hinnaksi 2,94 €.">
+  </figure>
+  <div>
+  <h1>Alennuslaskin</h1>
+  <p>Alennuslaskimella voit laskea tuotteen alennetun hinnan, kun alennus on merkitty prosentteina.</p>
+  <p>Alennuslaskin on verkkosivu, jonka voit lisätä puhelimen aloitusnäytölle kuvakkeeksi. Kun painat kuvaketta, alennuslaskin aukeaa samalla tavalla kuin sovellus. Voit lisätä kuvakkeen selaimessa.</p>
+  <p>Alennuslaskimen osoite on <a href="https://pikavalko.github.io/alennuslaskin/">https://pikavalko.github.io/alennuslaskin/</a>.</p>
 
-  <h2>Ennen kuin aloitat</h2>
-  <p>Avaa sivu puhelimen selaimessa. iPhonessa selain on yleensä Safari ja Android-puhelimessa Chrome tai Samsung Internet.</p>
-  <p>Jos linkki aukeaa viestisovelluksen, esimerkiksi WhatsAppin tai Messengerin, sisään, etsi sovelluksen valikosta valinta, jolla sivun voi avata selaimessa. Voit myös kopioida osoitteen ja liittää sen selaimen osoiteriville.</p>
+  <h2>Näin lisäät alennuslaskimen puhelimen aloitusnäytölle</h2>
+  <p>Avaa alennuslaskin puhelimen selaimessa. iPhonessa selain on yleensä Safari. Android-puhelimessa selain on yleensä Chrome tai Samsung Internet.</p>
+  <p>Linkki voi aueta viestisovelluksessa, esimerkiksi WhatsAppissa tai Messengerissä. Kopioi silloin alennuslaskimen osoite ja liitä se selaimen osoitepalkkiin.</p>
 
-  <h2>iPhone (Safari)</h2>
+  <h3>iPhone (Safari)</h3>
   <ol>
-    <li>Avaa sivu Safarissa.</li>
-    <li>Napauta <b>Jaa</b>-painiketta. Jos et näe painiketta, se on osoiterivin vieressä olevan valikon takana.</li>
-    <li>Valitse <b>Lisää Koti-valikkoon</b>. Jos et näe valintaa, selaa valikkoa alaspäin.</li>
-    <li>Napauta <b>Lisää</b>.</li>
+    <li>Paina <span class="ikoni" role="img" aria-label="Jaa-painike"><svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 9.5H5v11.5h14V9.5h-3.5"/><path d="M12 14.5V2.5"/><path d="M8 6.5l4-4 4 4"/></svg></span>. Jos painike ei ole näkyvissä, paina ensin <span class="ikoni" role="img" aria-label="Sivuvalikko-painike"><svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h13"/><path d="M4 18h9"/></svg></span>.</li>
+    <li>Valitse valikosta <b>Lisää Koti-valikkoon</b>.</li>
+    <li>Paina <b>Lisää</b>-painiketta.</li>
   </ol>
 
-  <h2>Android (Chrome)</h2>
+  <h3>Android (Chrome)</h3>
   <ol>
-    <li>Avaa sivu Chromessa.</li>
-    <li>Napauta osoitepalkin oikealla puolella olevaa <b>Lisää</b>-painiketta <span aria-hidden="true">⋮</span>.</li>
-    <li>Valitse <b>Lisää aloitusnäytölle</b> ja sitten <b>Luo pikakuvake</b>.</li>
-    <li>Tarkista nimi ja vahvista. Jos puhelin kysyy, minne kuvake lisätään, valitse <b>Lisää automaattisesti</b>.</li>
+    <li>Paina <span class="ikoni" role="img" aria-label="Lisää-painike"><svg viewBox="0 0 24 24" fill="#111" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></span>.</li>
+    <li>Valitse valikosta <b>Asenna ja luo pikakuvake</b>.</li>
+    <li>Paina <b>Asenna</b>-painiketta.</li>
   </ol>
 
-  <h2>Android (Samsung Internet)</h2>
+  <h3>Android (Samsung Internet)</h3>
   <ol>
-    <li>Avaa sivu Samsung Internetissä.</li>
-    <li>Napauta <b>Lisävalinnat</b>-painiketta.</li>
-    <li>Valitse valikosta kohta, jolla sivu lisätään alkunäyttöön, ja vahvista.</li>
+    <li>Paina <span class="ikoni" role="img" aria-label="Valikkopainike"><svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg></span>.</li>
+    <li>Valitse valikosta <b>Lisää sivu kohteeseen</b>.</li>
+    <li>Valitse <b>Alkunäyttö</b>.</li>
+    <li>Paina <b>Lisää</b>-painiketta.</li>
   </ol>
-
-  <h2>Muut selaimet</h2>
-  <p>Etsi selaimen valikosta valinta, jolla sivu lisätään aloitusnäyttöön.</p>
-
-  <h2>Jos lisääminen ei onnistu</h2>
-  <ul>
-    <li>Tarkista, että sivu on auki selaimessa eikä viestisovelluksen sisällä.</li>
-    <li>Kokeile toista selainta: iPhonessa Safaria ja Android-puhelimessa Chromea.</li>
-  </ul>
+  <footer>Pauliina Ikävalko 2026</footer>
+  </div>
 </main>
 </body>
 </html>
